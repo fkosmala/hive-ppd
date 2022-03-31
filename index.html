@@ -45,7 +45,8 @@
 				<hr />
 
 				<h3>Vote value : <span id="propHP"></span> HP</h3>
-				<h3><span id="percent"></span>% to fund the proposal</h3>
+				<h3 id="progressText"><span class="percent"></span>% to fund the proposal</h3>
+        <h3 id="funded">Porposal is now funded ! (<span class="percent"></span>%)</h3>
 			</div>
 		</div>
 	</div>
@@ -56,9 +57,6 @@
 		var proposalID = 211;
 
 		$(function() {
-      function getProposal() {
-
-      }
 			function getGlobal() {
 				$.ajax({
 					url: node,
@@ -100,15 +98,22 @@
   						totalHP = (result.total_votes * total);
   						$('#propHP').text(formatter.format(parseInt(totalHP)));
   						percent = ((totalHP/target)*100).toFixed(2);
-  						$('#percent').text(percent);
+              $('.percent').text(percent);
   						$('#progress').css('width', percent+'%');
+              if (percent < 100) {
+                $('#progressText').show();
+                $('#funded').hide();
+              } else {
+                $('#progressText').hide();
+                $('#funded').show();
+              }
   					});
 					});
 				});
 			}
 
 			getGlobal();
-			//setInterval(getProposal, 120000);
+			setInterval(getGlobal, 120000);
 		});
 	</script>
 </body>
