@@ -35,15 +35,15 @@
 				<h1>Proposal <span id="propId" class="text-danger"></span></h1>
 				<h2 id="propSubject"></h2>
 				<p>Created by <span id="propCreator"></span> for <span id="propReceiver"></span>
-				
+
 				<hr>
-				
+
 				<div class="progress">
 					<div id="progress" class="progress-bar progress-bar-striped bg-danger" role="progressbar" style="width: 1%" aria-valuemin="0" aria-valuemax="100"></div>
 				</div>
-				
+
 				<hr />
-				
+
 				<h3>Vote value : <span id="propHP"></span> HP</h3>
 				<h3><span id="percent"></span>% to fund the proposal</h3>
 			</div>
@@ -52,12 +52,14 @@
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 	<script>
 		var node = "https://api.openhive.network";
-		var target = 29076039;
 		var formatter = new Intl.NumberFormat('en-US');
 		var proposalID = 211;
-		
+
 		$(function() {
-			function getProposal() {
+      function getProposal() {
+
+      }
+			function getGlobal() {
 				$.ajax({
 					url: node,
 					type: "POST",
@@ -67,34 +69,46 @@
 					cache: false,
 		  		processData: false
 				}).done(function( data ) {
-					var tvfh = parseFloat(data.result.total_vesting_fund_hive)
+          var tvfh = parseFloat(data.result.total_vesting_fund_hive)
 					var tvs = parseFloat(data.result.total_vesting_shares);
 					var total = (tvfh / tvs)/1000000;
-					$.ajax({
+          $.ajax({
 						url: node,
 						type: "POST",
 						dataType: "json",
 						contentType: 'application/json',
-						data: '{"jsonrpc":"2.0", "method":"condenser_api.find_proposals", "params":[['+proposalID+']], "id":0}',
+						data: '{"jsonrpc":"2.0", "method":"condenser_api.find_proposals", "params":[[0]], "id":0}',
 						cache: false,
 						processData: false
 					}).done(function( data ) {
-						result = data.result[0];
-						$('#propId').text('#'+result.proposal_id);
-						$('#propSubject').text(result.subject);
-						$('#propCreator').text(result.creator);
-						$('#propReceiver').text(result.receiver);
-						totalHP = (result.total_votes * total);
-						$('#propHP').text(formatter.format(parseInt(totalHP)));
-						percent = ((totalHP/target)*100).toFixed(2);
-						$('#percent').text(percent);
-						$('#progress').css('width', percent+'%');
+            result = data.result[0];
+            target = (result.total_votes * total);
+            $.ajax({
+  						url: node,
+  						type: "POST",
+  						dataType: "json",
+  						contentType: 'application/json',
+  						data: '{"jsonrpc":"2.0", "method":"condenser_api.find_proposals", "params":[['+proposalID+']], "id":0}',
+  						cache: false,
+  						processData: false
+  					}).done(function( data ) {
+  						result = data.result[0];
+  						$('#propId').text('#'+result.proposal_id);
+  						$('#propSubject').text(result.subject);
+  						$('#propCreator').text(result.creator);
+  						$('#propReceiver').text(result.receiver);
+  						totalHP = (result.total_votes * total);
+  						$('#propHP').text(formatter.format(parseInt(totalHP)));
+  						percent = ((totalHP/target)*100).toFixed(2);
+  						$('#percent').text(percent);
+  						$('#progress').css('width', percent+'%');
+  					});
 					});
 				});
 			}
-			
-			getProposal();
-			setInterval(getProposal, 120000);
+
+			getGlobal();
+			//setInterval(getProposal, 120000);
 		});
 	</script>
 </body>
